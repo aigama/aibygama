@@ -1,0 +1,36 @@
+import os
+from dotenv import load_dotenv
+from crewai import Crew
+from agents import create_researcher, create_writer
+from tasks import create_research_task, create_writing_task
+
+load_dotenv()
+
+# Set up Azure OpenAI
+os.environ["OPENAI_API_TYPE"] = "azure"
+os.environ["OPENAI_API_BASE"] = os.getenv("AZURE_OPENAI_ENDPOINT")
+os.environ["OPENAI_API_KEY"] = os.getenv("AZURE_OPENAI_KEY")
+os.environ["OPENAI_API_VERSION"] = "2023-05-15"
+
+def main():
+    # Create agents
+    researcher = create_researcher()
+    writer = create_writer()
+
+    # Create tasks
+    research_task = create_research_task()
+    writing_task = create_writing_task()
+
+    # Create and run the crew
+    crew = Crew(
+        agents=[researcher, writer],
+        tasks=[research_task, writing_task],
+        verbose=True
+    )
+
+    result = crew.kickoff()
+    print("Crew AI Result:")
+    print(result)
+
+if __name__ == "__main__":
+    main()
